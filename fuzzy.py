@@ -29,11 +29,11 @@ def main():
     key = [True, False, True, True, False, True]#generate_random_128_bits()
     ekey = rsc.encode(key)
     bio_enc = [False, True, True, False, True, False] #generate_random_128_bits()
-    
+    bio_dec = [False, False, True, False, True, False]
 
     fuzzy = xor(bio_enc, ekey)
     #print(fuzzy)
-    fuzzy = xor(bio_enc, fuzzy)
+    fuzzy = xor(bio_dec, fuzzy)
 
     try:
         out, other1, other2 = rsc.decode(fuzzy)
