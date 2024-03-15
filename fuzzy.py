@@ -1,6 +1,8 @@
 from reedsolo import RSCodec, ReedSolomonError
 import random
-rsc = RSCodec(50)
+import matplotlib.pyplot as plt
+
+rsc = RSCodec(40)
 
 def generate_random_128_bits():
     # generate a random 128 long list of True / False values
@@ -68,9 +70,39 @@ def encode_decode_test(type, chance, len_range):
         bio_dec = evenly_distributed_error(bio_dec, 0.15)
     elif type == "burst":
         bio_dec = burst_error(bio_dec, 0.02, [3, 5])
+    elif type == "random":
+        bio_dec = generate_random_128_bits()
 
     out = decode(fuzzy, bio_dec)
     
     if out == key:
         return True
     return False
+
+def plot_test_runs(type):
+    chances = []
+    precentage_success = []
+
+    samples = 100
+
+    for i in range(0, 100, 5):
+        chance = i/100
+        #print(chance)
+        chances.append(chance)
+        successes = 0
+        for j in range(samples):
+            if encode_decode_test(type, chance, [3, 5]) == True:
+                successes += 1
+                #print("Success")
+        precentage_success.append(successes/samples)
+        if successes/samples == 0:
+            break
+    
+    plt.plot(chances, precentage_success)
+    plt.xlabel('Chance of error')
+    plt.ylabel('Precentage of successful decodes')
+    plt.show()
+
+plot_test_runs("even")
+
+#print(encode_decode_test("even", 0.1, [3, 5]))
