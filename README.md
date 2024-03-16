@@ -1,4 +1,4 @@
-# Übungsblatt 2 Ausarbeitung
+# Übungsblatt 2 Code
 Hier noch einmal der gesamte code.
 
 Ressourcen:
