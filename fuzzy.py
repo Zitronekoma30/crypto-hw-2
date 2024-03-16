@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 rsc = RSCodec(40)
 
 def generate_random_128_bits():
-    # generate a random 128 long list of True / False values
     return [random.choice([True, False]) for _ in range(128)]
 
 
