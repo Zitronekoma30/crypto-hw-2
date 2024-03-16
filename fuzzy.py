@@ -1,6 +1,7 @@
 from reedsolo import RSCodec, ReedSolomonError
 import random
 import matplotlib.pyplot as plt
+import numpy as np
 
 rsc = RSCodec(40)
 
@@ -53,9 +54,8 @@ def burst_error(bits, chance, length_range):
 def evenly_distributed_error(bits, chance):
     for i in range(len(bits)):
         if random.random() < chance:
-            bits[i] = not bits[i]
+            bits[i] = not bits[i] 
     return bits
-
 
 def encode_decode_test(type, chance, len_range):
     key = generate_random_128_bits()
@@ -66,9 +66,9 @@ def encode_decode_test(type, chance, len_range):
     
     # corrput bio_dec
     if type == "even":
-        bio_dec = evenly_distributed_error(bio_dec, 0.15)
+        bio_dec = evenly_distributed_error(bio_dec, chance)
     elif type == "burst":
-        bio_dec = burst_error(bio_dec, 0.02, [3, 5])
+        bio_dec = burst_error(bio_dec, chance, len_range)
     elif type == "random":
         bio_dec = generate_random_128_bits()
 
@@ -82,26 +82,49 @@ def plot_test_runs(type):
     chances = []
     precentage_success = []
 
-    samples = 100
+    samples = 30
 
-    for i in range(0, 100, 5):
+    for i in range(0, 100, 1):
         chance = i/100
         #print(chance)
         chances.append(chance)
         successes = 0
         for j in range(samples):
-            if encode_decode_test(type, chance, [3, 5]) == True:
+            if encode_decode_test(type, chance, [12, 20]) == True:
                 successes += 1
                 #print("Success")
         precentage_success.append(successes/samples)
         if successes/samples == 0:
-            break
-    
+            return chance
+
     plt.plot(chances, precentage_success)
     plt.xlabel('Chance of error')
     plt.ylabel('Precentage of successful decodes')
     plt.show()
 
-plot_test_runs("even")
+plot_test_runs("random")
+#print(encode_decode_test("random", 0.1, [3, 5]))
 
-#print(encode_decode_test("even", 0.1, [3, 5]))
+def find_point_of_failure():
+    length = [0, 5]
+    chance = []
+    upper_burst = []
+    for i in range(0, 20, 1):
+        length[0] += 5
+        length[1] += 5
+        chance.append(plot_test_runs("burst"))
+        upper_burst.append(length[1])
+    plt.plot(upper_burst, chance, 'o')
+
+    # calculate the trend line
+    z = np.polyfit(upper_burst, chance, 1)
+    p = np.poly1d(z)
+
+    # plot the trend line
+    plt.plot(upper_burst, p(upper_burst), "r--")
+
+    plt.xlabel('Length of burst error')
+    plt.ylabel('Maximum chance of successful decode')
+    plt.show()
+
+#find_point_of_failure()

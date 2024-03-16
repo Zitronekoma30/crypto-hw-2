@@ -38,10 +38,12 @@ def known_plaintext_attack(ciphertext, plaintext):
             shifts[shift] += 1
     
     most_common_shift = max(shifts, key=shifts.get)
+    if most_common_shift < 0:
+        most_common_shift += 26
     return most_common_shift
 
+plain =  "Conduct a known plaintext attack against the cipher implemented in task 9.) automatically find the z value used in the generated data."
+msg1 = caesar_cipher(plain, 19)
+print(msg1)
 
-msg = caesar_cipher("hello world", 3)
-
-print(msg)
-print(brute_force_caesar(msg))
+print(known_plaintext_attack(msg1, plain))
